@@ -69,3 +69,4 @@ char	*ft_strjoin(char *src1, char *src2)
 	free(src2);
 	return (str);
 }
+

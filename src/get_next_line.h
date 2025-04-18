@@ -30,5 +30,5 @@ typedef struct	s_buffer
 
 char	*ft_substr(const char *str, size_t start, size_t len);
 char	*ft_strjoin(char *src1, char *src2);
-
+void	*ft_realloc(void *old_array, size_t old_size, size_t new_size);
 #endif
