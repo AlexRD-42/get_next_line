@@ -6,7 +6,7 @@
 /*   By: adeimlin <adeimlin@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/18 11:03:00 by adeimlin          #+#    #+#             */
-/*   Updated: 2025/04/19 21:42:50 by adeimlin         ###   ########.fr       */
+/*   Updated: 2025/04/19 20:49:20 by adeimlin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,23 +30,15 @@ typedef struct	s_buffer
 	size_t	pos;
 }	t_buffer;
 
-typedef struct	s_position
-{
-	char	*end;
-	char	*start;
-	char	*ptr;
-}	t_position;
-
 typedef struct	s_length
 {
-	size_t	new;
 	size_t	old;
+	size_t	new;
+	size_t	start;
 }	t_length;
-
 
 char	*get_next_line(int fd);
 size_t	ft_strlcpy(char *dst, const char *src, size_t dst_size);
 void	*ft_memcpy(void *dst_void, const void *src_void, size_t n);
 void	*ft_realloc(void *old_array, size_t old_size, size_t new_size);
-void	*ft_memset(void *dst_void, uint8_t byte, size_t n);
 #endif
