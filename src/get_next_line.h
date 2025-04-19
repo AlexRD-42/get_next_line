@@ -20,7 +20,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-# define BUFFER_SIZE 1000
+# define BUFFER_SIZE 3
 
 typedef struct	s_buffer
 {
@@ -28,7 +28,6 @@ typedef struct	s_buffer
 	ssize_t	pos;
 }	t_buffer;
 
-char	*ft_substr(const char *str, size_t start, size_t len);
-char	*ft_strjoin(char *src1, char *src2);
+void	*ft_memcpy(void *dst_void, const void *src_void, size_t n);
 void	*ft_realloc(void *old_array, size_t old_size, size_t new_size);
 #endif

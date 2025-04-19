@@ -28,21 +28,44 @@ char	*ft_strncat(char *dst, const char *src, size_t n)
 	return (odst);
 }
 
+void	*ft_memcpy(void *dst_void, const void *src_void, size_t n)
+{
+	char		*dst;
+	const char	*src;
+
+	dst = (char *) dst_void;
+	src = (const char *) src_void;
+	if (dst == src)
+		return (dst_void);
+	while (n > 0)
+	{
+		*dst++ = *src++;
+		n--;
+	}
+	return (dst_void);
+}
+
+// Reallocates memory to a bigger size, copies old array
+// If the old array is NULL, this is effectively just malloc
 void	*ft_realloc(void *old_array, size_t old_size, size_t new_size)
 {
 	void	*new_array;
 
 	new_array = (void *) malloc (new_size);
 	if (new_array != NULL)
-		memcpy(new_array, old_array, old_size);
+	{
+		*((unsigned char *) new_array) = 0;
+		if (old_array != NULL)
+			ft_memcpy(new_array, old_array, old_size);
+	}
 	free(old_array);
 	return (new_array);
 }
 
-static ssize_t	ft_read(FILE *fd, t_buffer *buffer, ssize_t *start, char **str)
+static ssize_t	ft_read(FILE *fd, t_buffer *buffer, ssize_t *start)
 {
 	ssize_t	bytes_read;
-	
+
 	if (buffer->pos == 0 || buffer->pos >= BUFFER_SIZE) // Only reads from the file if the buffer is full or first run
 	{
 		// bytes_read = read(fd, buffer->str, BUFFER_SIZE);
@@ -51,47 +74,36 @@ static ssize_t	ft_read(FILE *fd, t_buffer *buffer, ssize_t *start, char **str)
 	}
 	else
 		bytes_read = (buffer->str[buffer->pos]) != 0; // Checks for EOF and sets byte status accordingly
-	if (bytes_read <= 0) // If EOF or error reading, set STR to NULL and return 0
-	{
-		*str = NULL;
-		return (0);
-	}
-	else // If not EOF, allocate empty string
-	{
-		*str = (char *) malloc(1);
-		if (*str == NULL)
-			return (0);
-		**str = 0;
-	}
 	*start = buffer->pos;
 	return (bytes_read);
 }
 
 char	*get_next_line(FILE *fd)
 {
-	static	t_buffer	buffer = {0};
+	static	t_buffer	buffer;
 	ssize_t				start;
-	size_t				old_len;
-	size_t				len;
 	char				*str;
+	ssize_t				old_len;
+	ssize_t				new_len;
 
 	if (fd == NULL || BUFFER_SIZE <= 0)
 		return (NULL);
+	str = NULL;
 	old_len = 1;
-	while (ft_read(fd, &buffer, &start, &str) > 0) // This will only be false when EOF
+	while (ft_read(fd, &buffer, &start) > 0) // This will only be false when EOF
 	{
 		while (buffer.pos < BUFFER_SIZE && buffer.str[buffer.pos] != '\n')
 			buffer.pos++;
-		len = old_len + buffer.pos - start;
-		str = ft_realloc(str, old_len, len);
+		new_len = old_len + buffer.pos - start;
+		str = ft_realloc(str, old_len, new_len);
 		if (str == NULL)
 			return (NULL);
-		str = ft_strncat(str, buffer.str + start, len);
-		old_len = len;
+		ft_strncat(str, buffer.str + start, new_len - old_len + 1);
+		old_len = new_len;
 		if (buffer.str[buffer.pos++] == '\n')
 			return (str);
 	}
-	return (str);
+	return (NULL);
 }
 
 int main()
