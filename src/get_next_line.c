@@ -62,7 +62,7 @@ void	*ft_realloc(void *old_array, size_t old_size, size_t new_size)
 	return (new_array);
 }
 
-static ssize_t	ft_read(FILE *fd, t_buffer *buffer, ssize_t *start)
+static ssize_t	ft_read(FILE *fd, t_buffer *buffer)
 {
 	ssize_t	bytes_read;
 
@@ -74,37 +74,62 @@ static ssize_t	ft_read(FILE *fd, t_buffer *buffer, ssize_t *start)
 	}
 	else
 		bytes_read = (buffer->str[buffer->pos]) != 0; // Checks for EOF and sets byte status accordingly
-	*start = buffer->pos;
 	return (bytes_read);
 }
 
 char	*get_next_line(FILE *fd)
 {
 	static	t_buffer	buffer;
-	ssize_t				start;
+	ssize_t				len;
 	char				*str;
-	ssize_t				old_len;
-	ssize_t				new_len;
 
 	if (fd == NULL || BUFFER_SIZE <= 0)
 		return (NULL);
 	str = NULL;
-	old_len = 1;
-	while (ft_read(fd, &buffer, &start) > 0) // This will only be false when EOF
+	len = 0;
+	while (ft_read(fd, &buffer) > 0) // This will only be false when EOF
 	{
 		while (buffer.pos < BUFFER_SIZE && buffer.str[buffer.pos] != '\n')
 			buffer.pos++;
-		new_len = old_len + buffer.pos - start;
-		str = ft_realloc(str, old_len, new_len);
+		str = ft_realloc(str, len + 1, buffer.pos + 1);
 		if (str == NULL)
 			return (NULL);
-		ft_strncat(str, buffer.str + start, new_len - old_len + 1);
-		old_len = new_len;
+		ft_strncat(str + len, buffer.str, buffer.pos + 1);
+		len += buffer.pos; 
 		if (buffer.str[buffer.pos++] == '\n')
 			return (str);
 	}
 	return (NULL);
 }
+
+
+// char	*get_next_line(FILE *fd)
+// {
+// 	static	t_buffer	buffer;
+// 	ssize_t				start;
+// 	char				*str;
+// 	ssize_t				old_len;
+// 	ssize_t				new_len;
+
+// 	if (fd == NULL || BUFFER_SIZE <= 0)
+// 		return (NULL);
+// 	str = NULL;
+// 	old_len = 0;
+// 	while (ft_read(fd, &buffer, &start) > 0) // This will only be false when EOF
+// 	{
+// 		while (buffer.pos < BUFFER_SIZE && buffer.str[buffer.pos] != '\n')
+// 			buffer.pos++;
+// 		new_len = buffer.pos - start;
+// 		str = ft_realloc(str, old_len + 1, old_len + new_len + 1);
+// 		if (str == NULL)
+// 			return (NULL);
+// 		ft_strncat(str + old_len, buffer.str + start, new_len + 1);
+// 		old_len += new_len;
+// 		if (buffer.str[buffer.pos++] == '\n')
+// 			return (str);
+// 	}
+// 	return (NULL);
+// }
 
 int main()
 {
