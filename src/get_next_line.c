@@ -6,26 +6,26 @@
 /*   By: adeimlin <adeimlin@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/18 11:07:58 by adeimlin          #+#    #+#             */
-/*   Updated: 2025/04/18 11:07:58 by adeimlin         ###   ########.fr       */
+/*   Updated: 2025/04/19 19:11:46 by adeimlin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char	*ft_strncat(char *dst, const char *src, size_t n)
+size_t	ft_strlcpy(char *dst, const char *src, size_t dst_size)
 {
-	char	*odst;
+	char const	*osrc = src;
 
-	odst = dst;
-	while (*dst != 0)
-		dst++;
-	while (*src != 0 && n > 0)
+	while (*src != 0 && dst_size > 1)
 	{
 		*dst++ = *src++;
-		n--;
+		dst_size--;
 	}
-	*dst = 0;
-	return (odst);
+	if (dst_size != 0)
+		*dst = 0;
+	while (*src != 0)
+		src++;
+	return (src - osrc);
 }
 
 void	*ft_memcpy(void *dst_void, const void *src_void, size_t n)
@@ -62,89 +62,59 @@ void	*ft_realloc(void *old_array, size_t old_size, size_t new_size)
 	return (new_array);
 }
 
-static ssize_t	ft_read(FILE *fd, t_buffer *buffer)
+static inline ssize_t	ft_read(int fd, t_buffer *buffer, t_length *len)
 {
 	ssize_t	bytes_read;
 
 	if (buffer->pos == 0 || buffer->pos >= BUFFER_SIZE) // Only reads from the file if the buffer is full or first run
 	{
-		// bytes_read = read(fd, buffer->str, BUFFER_SIZE);
-		bytes_read = fread(buffer->str, 1, BUFFER_SIZE, fd);
+		bytes_read = read(fd, buffer->str, BUFFER_SIZE);
 		buffer->pos = 0; // Resets position
 	}
 	else
 		bytes_read = (buffer->str[buffer->pos]) != 0; // Checks for EOF and sets byte status accordingly
+	len->start = buffer->pos;
 	return (bytes_read);
 }
 
-char	*get_next_line(FILE *fd)
+static inline char	ft_is_end(t_buffer *buffer)
 {
-	static	t_buffer	buffer;
-	ssize_t				len;
+	return (buffer->str[buffer->pos] != '\n' && buffer->str[buffer->pos] != 0);
+}
+
+char	*get_next_line(int fd)
+{
+	static	t_buffer	buffer = {0};
+	t_length			len;
 	char				*str;
 
-	if (fd == NULL || BUFFER_SIZE <= 0)
+	if (fd == -1 || BUFFER_SIZE <= 0)
 		return (NULL);
 	str = NULL;
-	len = 0;
-	while (ft_read(fd, &buffer) > 0) // This will only be false when EOF
+	len.old = 0;
+	while (ft_read(fd, &buffer, &len) > 0) // This will only be false when EOF
 	{
-		while (buffer.pos < BUFFER_SIZE && buffer.str[buffer.pos] != '\n')
+		while (buffer.pos < BUFFER_SIZE && ft_is_end(&buffer))
 			buffer.pos++;
-		str = ft_realloc(str, len + 1, buffer.pos + 1);
+		len.new = (buffer.pos - len.start) + (buffer.str[buffer.pos] == '\n');
+		str = ft_realloc(str, len.old, len.old + len.new + 1);
 		if (str == NULL)
 			return (NULL);
-		ft_strncat(str + len, buffer.str, buffer.pos + 1);
-		len += buffer.pos; 
-		if (buffer.str[buffer.pos++] == '\n')
-			return (str);
+		ft_strlcpy(str + len.old, buffer.str + len.start, len.new + 1);
+		len.old += len.new;
+		if (buffer.str[buffer.pos++] == '\n' || len.new < 2)
+			return(str);
 	}
+	free(str);
 	return (NULL);
 }
 
-
-// char	*get_next_line(FILE *fd)
+// int main()
 // {
-// 	static	t_buffer	buffer;
-// 	ssize_t				start;
-// 	char				*str;
-// 	ssize_t				old_len;
-// 	ssize_t				new_len;
-
-// 	if (fd == NULL || BUFFER_SIZE <= 0)
-// 		return (NULL);
-// 	str = NULL;
-// 	old_len = 0;
-// 	while (ft_read(fd, &buffer, &start) > 0) // This will only be false when EOF
-// 	{
-// 		while (buffer.pos < BUFFER_SIZE && buffer.str[buffer.pos] != '\n')
-// 			buffer.pos++;
-// 		new_len = buffer.pos - start;
-// 		str = ft_realloc(str, old_len + 1, old_len + new_len + 1);
-// 		if (str == NULL)
-// 			return (NULL);
-// 		ft_strncat(str + old_len, buffer.str + start, new_len + 1);
-// 		old_len += new_len;
-// 		if (buffer.str[buffer.pos++] == '\n')
-// 			return (str);
-// 	}
-// 	return (NULL);
+// 	int fd1 = open("test.txt", O_RDONLY);
+// 	printf("%s", get_next_line(fd1));
+// 	printf("%s", get_next_line(fd1));
+// 	close(fd1);
+// 	// close(fd2);
+// 	return(0);
 // }
-
-int main()
-{
-	FILE *fd1 = fopen("test.txt", "r");
-	// FILE *fd2 = fopen("test.txt", "r");
-	printf("-%s-", get_next_line(fd1));
-	printf("%s-", get_next_line(fd1));
-	printf("%s-", get_next_line(fd1));
-	printf("%s-", get_next_line(fd1));
-	printf("%s-", get_next_line(fd1));
-	printf("%s-", get_next_line(fd1));
-	printf("%s-", get_next_line(fd1));
-	printf("%s-", get_next_line(fd1));
-	printf("%s-", get_next_line(fd1));
-	fclose(fd1);
-	// fclose(fd2);
-	return(0);
-}
