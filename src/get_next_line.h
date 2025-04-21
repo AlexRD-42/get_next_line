@@ -6,7 +6,7 @@
 /*   By: adeimlin <adeimlin@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/18 11:03:00 by adeimlin          #+#    #+#             */
-/*   Updated: 2025/04/19 21:42:50 by adeimlin         ###   ########.fr       */
+/*   Updated: 2025/04/21 13:57:17 by adeimlin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,25 +24,19 @@
 # define BUFFER_SIZE 10
 #endif
 
-typedef struct	s_buffer
-{
-	char	str[BUFFER_SIZE];
-	size_t	pos;
-}	t_buffer;
-
 typedef struct	s_position
 {
-	char	*end;
-	char	*start;
-	char	*ptr;
+	const char	*end;
+	char		*optr;
+	char		*ptr;
+	size_t		diff;
 }	t_position;
 
-typedef struct	s_length
+typedef struct	s_string
 {
-	size_t	new;
-	size_t	old;
-}	t_length;
-
+	char	*data;
+	size_t	len;
+}	t_string;
 
 char	*get_next_line(int fd);
 size_t	ft_strlcpy(char *dst, const char *src, size_t dst_size);
