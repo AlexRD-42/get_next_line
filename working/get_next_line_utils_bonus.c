@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line_utils.c                              :+:      :+:    :+:   */
+/*   get_next_line_utils_bonus.c                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: adeimlin <adeimlin@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/18 10:34:10 by adeimlin          #+#    #+#             */
-/*   Updated: 2025/04/21 17:02:19 by adeimlin         ###   ########.fr       */
+/*   Updated: 2025/04/21 16:43:50 by adeimlin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 size_t	ft_strlcpy(char *dst, const char *src, size_t dst_size)
 {
@@ -72,27 +72,4 @@ void	*ft_realloc(void *old_array, size_t old_size, size_t new_size)
 	}
 	free(old_array);
 	return (new_array);
-}
-
-void	*ft_memmove(void *dst_void, const void *src_void, size_t n)
-{
-	char		*dst;
-	const char	*src = (const char *) src_void;
-
-	dst = (char *) dst_void;
-	if (n == 0 || dst == src)
-		return (dst_void);
-	if ((uintptr_t) dst < (uintptr_t) src)
-	{
-		while (n-- > 0)
-			*dst++ = *src++;
-	}
-	else
-	{
-		dst += n - 1;
-		src += n - 1;
-		while (n-- > 0)
-			*dst-- = *src--;
-	}
-	return (dst_void);
 }

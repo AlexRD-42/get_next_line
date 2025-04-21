@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: adeimlin <adeimlin@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/18 11:07:58 by adeimlin          #+#    #+#             */
-/*   Updated: 2025/04/21 17:48:18 by adeimlin         ###   ########.fr       */
+/*   Updated: 2025/04/21 16:55:12 by adeimlin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 static uint8_t	ft_init(int fd, char *buffer, t_position *pos, t_string *str)
 {
@@ -21,6 +21,9 @@ static uint8_t	ft_init(int fd, char *buffer, t_position *pos, t_string *str)
 	pos->diff = BUFFER_SIZE;
 	pos->ptr = buffer;
 	pos->end = buffer + BUFFER_SIZE;
+	while (pos->ptr < pos->end && *(pos->ptr) == 0)
+		pos->ptr++;
+	pos->optr = pos->ptr;
 	return (0);
 }
 
@@ -29,9 +32,10 @@ static ssize_t	ft_read(int fd, char *buffer, t_position *pos, t_string *str)
 	ssize_t	bytes_read;
 
 	bytes_read = pos->diff >= BUFFER_SIZE;
-	if (pos->ptr >= pos->end || *buffer == 0)
+	if (pos->ptr >= pos->end)
 	{
 		pos->ptr = buffer;
+		pos->optr = buffer;
 		bytes_read = read(fd, buffer, BUFFER_SIZE);
 		if (bytes_read < 0)
 		{
@@ -39,41 +43,32 @@ static ssize_t	ft_read(int fd, char *buffer, t_position *pos, t_string *str)
 			free(str->data);
 			str->data = NULL;
 		}
-		else
-			pos->end = buffer + bytes_read;
 	}
 	return (bytes_read);
 }
 
-static uint8_t	ft_merge(char *buffer, t_position *pos, t_string *str)
-{
-	pos->diff = pos->ptr - buffer;
-	str->data = ft_realloc(str->data, str->len, str->len + pos->diff + 1);
-	if (str->data == NULL)
-		return (1);
-	ft_strlcpy(str->data + str->len, buffer, pos->diff + 1);
-	str->len += pos->diff;
-	pos->end -= pos->diff;
-	ft_memmove(buffer, pos->ptr, pos->end - buffer);
-	*(pos->end) = 0;
-	return (*(str->data + str->len - (str->len > 0)) == '\n');
-}
-
 char	*get_next_line(int fd)
 {
-	static char	buffer[BUFFER_SIZE] = {0};
+	static char	buffer[1024][BUFFER_SIZE];
 	t_position	pos;
 	t_string	str;
 
-	if (ft_init(fd, buffer, &pos, &str) == 1)
+	if (ft_init(fd, buffer[fd], &pos, &str) == 1)
 		return (NULL);
-	while (ft_read(fd, buffer, &pos, &str) > 0)
+	while (ft_read(fd, buffer[fd], &pos, &str) > 0)
 	{
 		while (pos.ptr < pos.end && *(pos.ptr) != '\n' && *(pos.ptr) != 0)
 			pos.ptr++;
 		if (pos.ptr < pos.end && *(pos.ptr) == '\n')
 			pos.ptr++;
-		if (ft_merge(buffer, &pos, &str) == 1)
+		pos.diff = pos.ptr - pos.optr;
+		str.data = ft_realloc(str.data, str.len, str.len + pos.diff + 1);
+		if (str.data == NULL)
+			return (NULL);
+		ft_strlcpy(str.data + str.len, pos.optr, pos.diff + 1);
+		str.len += pos.diff;
+		ft_memset(pos.optr, 0, pos.diff);
+		if (*(str.data + str.len - (str.len > 0)) == '\n')
 			break ;
 	}
 	return (str.data);
