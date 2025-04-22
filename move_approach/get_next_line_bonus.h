@@ -1,27 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.h                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: adeimlin <adeimlin@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/18 11:03:00 by adeimlin          #+#    #+#             */
-/*   Updated: 2025/04/21 17:23:21 by adeimlin         ###   ########.fr       */
+/*   Updated: 2025/04/22 10:55:20 by adeimlin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GET_NEXT_LINE_H
-# define GET_NEXT_LINE_H
+#ifndef GET_NEXT_LINE_BONUS_H
+# define GET_NEXT_LINE_BONUS_H
 
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 32
+#  define BUFFER_SIZE 1024
+# endif
+
+# ifndef FD_LIMIT
+#  define FD_LIMIT 1024
 # endif
 
 # include <stdint.h>
 # include <stddef.h>
 # include <stdlib.h>
 # include <unistd.h>
-# include <fcntl.h>
 
 typedef struct s_position
 {
