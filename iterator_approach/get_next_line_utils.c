@@ -6,7 +6,7 @@
 /*   By: adeimlin <adeimlin@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/18 10:34:10 by adeimlin          #+#    #+#             */
-/*   Updated: 2025/04/23 16:39:33 by adeimlin         ###   ########.fr       */
+/*   Updated: 2025/04/29 09:50:33 by adeimlin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,19 +45,19 @@ void	*ft_memcpy(void *dst_void, const void *src_void, size_t size)
 	return (dst_void);
 }
 
-void	*ft_realloc(void *old_array, size_t old_size, size_t new_size)
+void	*ft_realloc(void *src, size_t src_size, size_t dst_size)
 {
-	void	*new_array;
+	void	*dst;
 
-	new_array = (void *) malloc (new_size);
-	if (new_array != NULL)
+	dst = (void *) malloc (dst_size);
+	if (dst != NULL)
 	{
-		*((unsigned char *) new_array) = 0;
-		if (old_array != NULL)
-			ft_memcpy(new_array, old_array, old_size);
+		*((unsigned char *) dst) = 0;
+		if (src != NULL)
+			ft_memcpy(dst, src, src_size);
 	}
-	free(old_array);
-	return (new_array);
+	free(src);
+	return (dst);
 }
 
 ssize_t	ft_read(int fd, char *buffer, t_position *pos, char **str)
